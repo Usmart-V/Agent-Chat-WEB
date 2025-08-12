@@ -1,361 +1,505 @@
-<style>
-/* Estilos del body son importantes, no los elimines */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: transparent;
-}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agente AI de Factoriapp</title>
+    <!-- Enlace para la fuente Roboto de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Roboto', sans-serif; /* Usando la fuente Roboto */
+            background-color: #323232;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alineado arriba */
+        }
 
-/* El chat-widget ahora se posiciona dentro de este contenedor principal */
-.chat-widget {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 10000;
-}
+        .main-container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            justify-content: center; /* Centrando el contenido principal */
+            align-items: flex-start; /* Alineado arriba */
+            flex-wrap: wrap;
+            margin-top: 50px; /* Separación desde la parte superior */
+        }
 
-.chat-button {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 495px; /* Tamaño 10% más grande para Factorín */
+            text-align: center;
+        }
 
-.chat-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
-}
-
-.chat-button img {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-}
-
-.close-icon {
-    display: none;
-    color: white;
-    font-size: 24px;
-    font-weight: bold;
-}
-
-.chat-button.active .chat-icon { display: none; }
-.chat-button.active .close-icon { display: block; }
-
-.chat-container {
-    position: absolute;
-    bottom: 80px;
-    right: 0;
-    width: 350px;
-    height: 500px;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.3s ease;
-}
-
-.chat-container.open {
-    display: flex;
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.chat-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 20px;
-    text-align: center;
-}
-
-.chat-header h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.chat-header .status {
-    font-size: 12px;
-    opacity: 0.9;
-    margin-top: 4px;
-}
-
-.chat-messages {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    background: #f8f9fa;
-}
-
-.message {
-    margin-bottom: 15px;
-    display: flex;
-    align-items: flex-start;
-}
-
-.message.user {
-    justify-content: flex-end;
-}
-
-.message-content {
-    max-width: 80%;
-    padding: 12px 16px;
-    border-radius: 18px;
-    font-size: 14px;
-    line-height: 1.4;
-}
-
-.message.user .message-content {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-bottom-right-radius: 6px;
-}
-
-.message.bot .message-content {
-    background: white;
-    color: #333;
-    border: 1px solid #e1e8ed;
-    border-bottom-left-radius: 6px;
-}
-
-.bot-avatar {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    margin-right: 10px;
-    margin-top: 2px;
-}
-
-.chat-input-container {
-    padding: 20px;
-    background: white;
-    border-top: 1px solid #e1e8ed;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.chat-input {
-    flex: 1;
-    border: 1px solid #e1e8ed;
-    border-radius: 25px;
-    padding: 12px 16px;
-    font-size: 14px;
-    outline: none;
-    resize: none;
-    max-height: 60px;
-    min-height: 40px;
-}
-
-.chat-input:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
-}
-
-.send-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    color: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.send-button:hover {
-    transform: scale(1.1);
-}
-
-.typing-indicator {
-    display: none;
-    padding: 10px 16px;
-    color: #666;
-    font-size: 12px;
-    font-style: italic;
-}
-
-.notification-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: #ff4757;
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-}
-</style>
-
-<div class="chat-widget">
-    <button class="chat-button" onclick="toggleChat()">
-        <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/factappito-AGBb8Wv4wKiQqZqV.png" alt="Chat" class="chat-icon">
-        <span class="close-icon">×</span>
-        <div class="notification-badge" id="notificationBadge">1</div>
-    </button>
-    
-    <div class="chat-container" id="chatContainer">
-        <div class="chat-header">
-            <h3>Agente AI Factoriapp</h3>
-            <div class="status">En línea</div>
-        </div>
+        .right-column {
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            margin-left: -50px; /* Ajuste para acercar el chat a la imagen */
+            margin-top: -20px; /* Ajuste para subir el chat a un punto intermedio */
+        }
         
-        <div class="chat-messages" id="chatMessages">
-            <div class="message bot">
-                <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/factappito-AGBb8Wv4wKiQqZqV.png" alt="Bot" class="bot-avatar">
-                <div class="message-content">
-                    ¡Hola! Soy el Agente AI de Factoriapp. Estoy aquí para ayudarte en lo que necesites.
+        .large-image {
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+        }
+
+        .header-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 220px; /* Tamaño 10% más grande para el logo */
+            height: auto;
+        }
+
+        /* Estilos del chat-widget para que se vea centrado en la página */
+        .chat-widget {
+            position: relative;
+            width: 380px; /* Ancho ajustado para contener el marco y el chat */
+            margin: 0 auto;
+        }
+
+        /* Nuevo estilo para el marco de la tablet */
+        .tablet-frame {
+            position: relative;
+            background-color: black;
+            border-radius: 30px;
+            padding: 15px; /* Crea el efecto de bisel */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            margin: auto;
+        }
+
+        /* Detalle del altavoz de la tablet */
+        .tablet-frame::before {
+            content: '';
+            position: absolute;
+            top: 5px; /* Posición del altavoz */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 5px;
+            background-color: #555;
+            border-radius: 5px;
+        }
+
+        /* Detalle del botón de inicio de la tablet */
+        .tablet-frame::after {
+            content: '';
+            position: absolute;
+            bottom: 5px; /* Posición del botón de inicio */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25px;
+            height: 25px;
+            background-color: #555;
+            border-radius: 50%;
+        }
+
+        .chat-button {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 20px auto;
+        }
+
+        .chat-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-icon {
+            display: block;
+            width: 35px;
+            height: 35px;
+        }
+
+        .close-icon {
+            display: none;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .chat-button.active .chat-icon {
+            display: none;
+        }
+
+        .chat-button.active .close-icon {
+            display: block;
+        }
+
+        .chat-container {
+            position: relative;
+            width: 350px;
+            height: 500px;
+            background: #e4eef4; /* Fondo del chat actualizado */
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            margin: 0 auto;
+        }
+
+        .chat-container.open {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #2A5D75 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chat-header .status {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: transparent; /* Fondo transparente para usar el del contenedor principal */
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 6px;
+            font-style: italic; /* Mensajes de usuario en itálica */
+        }
+
+        .message.bot .message-content {
+            background: #dbe7ec; /* Fondo del mensaje del bot actualizado para contrastar */
+            color: #333;
+            border: 1px solid #e1e8ed;
+            border-bottom-left-radius: 6px;
+        }
+
+        .bot-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+            margin-top: 2px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e1e8ed;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: 1px solid #e1e8ed;
+            border-radius: 25px;
+            padding: 12px 16px;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            max-height: 60px;
+            min-height: 40px;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .send-button:hover {
+            transform: scale(1.1);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px 16px;
+            color: #666;
+            font-size: 12px;
+            font-style: italic;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Media queries para adaptar el diseño a pantallas más pequeñas */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                justify-content: center;
+            }
+            .left-column, .right-column {
+                max-width: 100%;
+                margin: 20px 0;
+            }
+            .right-column {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/logo4-YrDJvpa3V6sRZV5K.png" alt="Logo de Factoriapp" class="header-logo">
+    <div class="main-container">
+        <!-- Contenido de la izquierda (imagen) -->
+        <div class="left-column">
+            <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/1ai-5-YNq21RRzgWClZyOe.png" alt="Agente AI" class="large-image">
+        </div>
+
+        <!-- Contenido de la derecha (chat) -->
+        <div class="right-column">
+            <div class="chat-widget">
+                <button class="chat-button active" onclick="toggleChat()">
+                    <!-- Icono de chat genérico en SVG -->
+                    <svg class="chat-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span class="close-icon">×</span>
+                    <div class="notification-badge" id="notificationBadge">1</div>
+                </button>
+                
+                <div class="tablet-frame">
+                    <div class="chat-container open" id="chatContainer">
+                        <div class="chat-header">
+                            <h3>Agente AI Factoriapp</h3>
+                            <div class="status">En línea</div>
+                        </div>
+                        
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message bot">
+                                <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/factappito-AGBb8Wv4wKiQqZqV.png" alt="Bot" class="bot-avatar">
+                                <div class="message-content">
+                                    ¡Hola! Soy el Agente AI de Factoriapp. Estoy aquí para ayudarte en lo que necesites.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="typing-indicator" id="typingIndicator">
+                            El agente está escribiendo...
+                        </div>
+                        
+                        <div class="chat-input-container">
+                            <textarea class="chat-input" id="chatInput" placeholder="Escribe tu mensaje..." rows="1"></textarea>
+                            <button class="send-button" onclick="sendMessage()" id="sendButton">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="typing-indicator" id="typingIndicator">
-            El agente está escribiendo...
-        </div>
-        
-        <div class="chat-input-container">
-            <textarea class="chat-input" id="chatInput" placeholder="Escribe tu mensaje..." rows="1"></textarea>
-            <button class="send-button" onclick="sendMessage()" id="sendButton">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
-                </svg>
-            </button>
-        </div>
     </div>
-</div>
+    
+    <script>
+        let isOpen = true; // El chat está abierto por defecto
+        let messageCount = 0;
 
-<script>
-    let isOpen = false;
-    let messageCount = 0;
+        function toggleChat() {
+            const container = document.getElementById('chatContainer');
+            const button = document.querySelector('.chat-button');
+            const badge = document.getElementById('notificationBadge');
+            
+            if (isOpen) {
+                container.classList.remove('open');
+                setTimeout(() => {
+                    container.style.display = 'none';
+                }, 300);
+                button.classList.remove('active');
+                isOpen = false;
+            } else {
+                container.style.display = 'flex';
+                setTimeout(() => {
+                    container.classList.add('open');
+                }, 10);
+                button.classList.add('active');
+                badge.style.display = 'none';
+                isOpen = true;
+                setTimeout(() => {
+                    document.getElementById('chatInput').focus();
+                }, 400);
+            }
+        }
 
-    function toggleChat() {
-        const container = document.getElementById('chatContainer');
-        const button = document.querySelector('.chat-button');
-        const badge = document.getElementById('notificationBadge');
-        
-        if (isOpen) {
-            container.classList.remove('open');
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            showTypingIndicator();
+            
             setTimeout(() => {
-                container.style.display = 'none';
-            }, 300);
-            button.classList.remove('active');
-            isOpen = false;
-        } else {
+                hideTypingIndicator();
+                const botResponse = generateBotResponse(message);
+                addMessage(botResponse, 'bot');
+            }, 1500);
+        }
+
+        function addMessage(message, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            let messageHTML = '';
+            if (sender === 'bot') {
+                messageHTML = `
+                    <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/factappito-AGBb8Wv4wKiQqZqV.png" alt="Bot" class="bot-avatar">
+                    <div class="message-content">${message}</div>
+                `;
+            } else {
+                messageHTML = `<div class="message-content">${message}</div>`;
+            }
+            
+            messageDiv.innerHTML = messageHTML;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            if (!isOpen && sender === 'bot') {
+                showNotification();
+            }
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'block';
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function showNotification() {
+            const badge = document.getElementById('notificationBadge');
+            badge.style.display = 'flex';
+            messageCount++;
+            badge.textContent = messageCount;
+        }
+
+        function generateBotResponse(userMessage) {
+            const responses = [
+                "¡Gracias por tu mensaje! ¿En qué más puedo ayudarte?",
+                "Entiendo tu consulta. Permíteme ayudarte con eso.",
+                "¡Perfecto! Estoy aquí para resolver todas tus dudas sobre Factoriapp.",
+                "Es un placer ayudarte. ¿Hay algo específico que necesites saber?",
+                "¡Excelente pregunta! Te ayudo de inmediato."
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        document.getElementById('chatInput').addEventListener('input', function() {
+            this.style.height = '40px';
+            this.style.height = Math.min(this.scrollHeight, 60) + 'px';
+        });
+
+        // Asegurarse de que el chat está abierto al cargar la página y el botón tiene el estado correcto
+        window.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('chatContainer');
+            const button = document.querySelector('.chat-button');
+            const badge = document.getElementById('notificationBadge');
+            
+            container.classList.add('open');
             container.style.display = 'flex';
-            setTimeout(() => {
-                container.classList.add('open');
-            }, 10);
             button.classList.add('active');
-            badge.style.display = 'none';
+            badge.style.display = 'none'; // Ocultar la notificación inicial
             isOpen = true;
-            setTimeout(() => {
-                document.getElementById('chatInput').focus();
-            }, 400);
-        }
-    }
+            document.getElementById('chatInput').focus();
+        });
+    </script>
+</body>
+</html>
 
-    function sendMessage() {
-        const input = document.getElementById('chatInput');
-        const message = input.value.trim();
-        
-        if (message === '') return;
-        
-        addMessage(message, 'user');
-        input.value = '';
-        
-        showTypingIndicator();
-        
-        setTimeout(() => {
-            hideTypingIndicator();
-            const botResponse = generateBotResponse(message);
-            addMessage(botResponse, 'bot');
-        }, 1500);
-    }
-
-    function addMessage(message, sender) {
-        const messagesContainer = document.getElementById('chatMessages');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${sender}`;
-        
-        let messageHTML = '';
-        if (sender === 'bot') {
-            messageHTML = `
-                <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/factappito-AGBb8Wv4wKiQqZqV.png" alt="Bot" class="bot-avatar">
-                <div class="message-content">${message}</div>
-            `;
-        } else {
-            messageHTML = `<div class="message-content">${message}</div>`;
-        }
-        
-        messageDiv.innerHTML = messageHTML;
-        messagesContainer.appendChild(messageDiv);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        
-        if (!isOpen && sender === 'bot') {
-            showNotification();
-        }
-    }
-
-    function showTypingIndicator() {
-        document.getElementById('typingIndicator').style.display = 'block';
-        const messagesContainer = document.getElementById('chatMessages');
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    function hideTypingIndicator() {
-        document.getElementById('typingIndicator').style.display = 'none';
-    }
-
-    function showNotification() {
-        const badge = document.getElementById('notificationBadge');
-        badge.style.display = 'flex';
-        messageCount++;
-        badge.textContent = messageCount;
-    }
-
-    function generateBotResponse(userMessage) {
-        const responses = [
-            "¡Gracias por tu mensaje! ¿En qué más puedo ayudarte?",
-            "Entiendo tu consulta. Permíteme ayudarte con eso.",
-            "¡Perfecto! Estoy aquí para resolver todas tus dudas sobre Factoriapp.",
-            "Es un placer ayudarte. ¿Hay algo específico que necesites saber?",
-            "¡Excelente pregunta! Te ayudo de inmediato."
-        ];
-        
-        return responses[Math.floor(Math.random() * responses.length)];
-    }
-
-    document.getElementById('chatInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-
-    document.getElementById('chatInput').addEventListener('input', function() {
-        this.style.height = '40px';
-        this.style.height = Math.min(this.scrollHeight, 60) + 'px';
-    });
-</script>
