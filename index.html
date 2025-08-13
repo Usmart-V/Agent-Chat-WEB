@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agente AI de Factoriapp</title>
-    <!-- Enlace para la fuente Roboto de Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Enlace para las fuentes Montserrat, Roboto y Space Grotesk de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;1,400&family=Roboto:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@500&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
             padding: 20px;
-            font-family: 'Roboto', sans-serif; /* Usando la fuente Roboto */
+            font-family: 'Roboto', sans-serif; /* Usando la fuente Roboto por defecto */
             background-color: #323232;
             min-height: 100vh;
             display: flex;
@@ -25,7 +25,7 @@
             justify-content: center; /* Centrando el contenido principal */
             align-items: flex-start; /* Alineado arriba */
             flex-wrap: wrap;
-            margin-top: 50px; /* Separación desde la parte superior */
+            margin-top: 100px;
         }
 
         .left-column {
@@ -34,79 +34,70 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            max-width: 495px; /* Tamaño 10% más grande para Factorín */
+            max-width: 350px;
             text-align: center;
         }
 
         .right-column {
             width: 100%;
-            max-width: 420px;
+            max-width: 650px;
             text-align: center;
-            margin-left: -50px; /* Ajuste para acercar el chat a la imagen */
-            margin-top: -20px; /* Ajuste para subir el chat a un punto intermedio */
+            margin-left: 50px;
+            margin-top: -80px; /* Ajuste para subir el monitor 4 líneas */
         }
         
         .large-image {
             width: 100%;
             height: auto;
             border-radius: 20px;
+            transition: opacity 1.5s ease-in-out;
         }
 
         .header-logo {
             position: absolute;
             top: 20px;
             left: 20px;
-            width: 220px; /* Tamaño 10% más grande para el logo */
+            width: 220px;
             height: auto;
+        }
+        
+        /* Estilo para el nuevo texto */
+        .header-text {
+            position: absolute;
+            top: 75px;
+            left: 30px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            color: #E4EEF4;
+            font-weight: 500;
+        }
+        
+        /* Estilo para las letras destacadas */
+        .highlight-color {
+            color: #27D5D5;
         }
 
         /* Estilos del chat-widget para que se vea centrado en la página */
         .chat-widget {
             position: relative;
-            width: 380px; /* Ancho ajustado para contener el marco y el chat */
+            width: 630px;
             margin: 0 auto;
         }
 
-        /* Nuevo estilo para el marco de la tablet */
+        /* Nuevo estilo para el marco del monitor */
         .tablet-frame {
             position: relative;
             background-color: black;
-            border-radius: 30px;
-            padding: 15px; /* Crea el efecto de bisel */
+            border-radius: 15px;
+            padding: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
             margin: auto;
-        }
-
-        /* Detalle del altavoz de la tablet */
-        .tablet-frame::before {
-            content: '';
-            position: absolute;
-            top: 5px; /* Posición del altavoz */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 5px;
-            background-color: #555;
-            border-radius: 5px;
-        }
-
-        /* Detalle del botón de inicio de la tablet */
-        .tablet-frame::after {
-            content: '';
-            position: absolute;
-            bottom: 5px; /* Posición del botón de inicio */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 25px;
-            height: 25px;
-            background-color: #555;
-            border-radius: 50%;
         }
 
         .chat-button {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: black;
             border: none;
             border-radius: 50%;
             cursor: pointer;
@@ -121,36 +112,35 @@
 
         .chat-button:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
         }
 
         .chat-icon {
             display: block;
             width: 35px;
             height: 35px;
-        }
-
-        .close-icon {
-            display: none;
             color: white;
-            font-size: 24px;
-            font-weight: bold;
         }
 
+        .close-icon-svg {
+            display: none;
+            width: 24px;
+            height: 24px;
+        }
+        
         .chat-button.active .chat-icon {
             display: none;
         }
 
-        .chat-button.active .close-icon {
+        .chat-button.active .close-icon-svg {
             display: block;
         }
 
         .chat-container {
             position: relative;
-            width: 350px;
-            height: 500px;
-            background: #e4eef4; /* Fondo del chat actualizado */
-            border-radius: 20px;
+            width: 600px;
+            height: 450px;
+            background: #e4eef4;
+            border-radius: 10px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             display: none;
             flex-direction: column;
@@ -168,10 +158,11 @@
         }
 
         .chat-header {
-            background: linear-gradient(135deg, #2A5D75 0%, #764ba2 100%);
-            color: white;
+            background-color: #2A5D75;
+            color: #E4EEF4;
             padding: 20px;
-            text-align: center;
+            text-align: left;
+            font-family: 'Space Grotesk', sans-serif;
         }
 
         .chat-header h3 {
@@ -184,13 +175,14 @@
             font-size: 12px;
             opacity: 0.9;
             margin-top: 4px;
+            color: #27D5D5;
         }
 
         .chat-messages {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
-            background: transparent; /* Fondo transparente para usar el del contenedor principal */
+            background: transparent;
         }
 
         .message {
@@ -212,17 +204,19 @@
         }
 
         .message.user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #2A5D75;
             color: white;
             border-bottom-right-radius: 6px;
-            font-style: italic; /* Mensajes de usuario en itálica */
+            font-family: 'Montserrat', sans-serif;
+            font-style: italic;
         }
 
         .message.bot .message-content {
-            background: #dbe7ec; /* Fondo del mensaje del bot actualizado para contrastar */
+            background: #dbe7ec;
             color: #333;
             border: 1px solid #e1e8ed;
             border-bottom-left-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .bot-avatar {
@@ -252,6 +246,8 @@
             resize: none;
             max-height: 60px;
             min-height: 40px;
+            font-family: 'Roboto', sans-serif;
+            font-style: italic;
         }
 
         .chat-input:focus {
@@ -260,7 +256,7 @@
         }
 
         .send-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #2A5D75;
             border: none;
             border-radius: 50%;
             width: 40px;
@@ -301,6 +297,32 @@
             font-weight: bold;
         }
 
+        /* Botón de Volver */
+        .back-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: #9FC99B;
+            font-family: 'Roboto', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+
+        .back-button:hover {
+            color: #E4EEF4;
+        }
+
+        .back-button-arrow {
+            width: 12px;
+            height: 12px;
+            fill: currentColor; /* El color se hereda del padre */
+        }
+        
         /* Media queries para adaptar el diseño a pantallas más pequeñas */
         @media (max-width: 768px) {
             .main-container {
@@ -320,10 +342,22 @@
 </head>
 <body>
     <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/logo4-YrDJvpa3V6sRZV5K.png" alt="Logo de Factoriapp" class="header-logo">
+    <div class="header-text">
+        <span class="highlight-color">I</span>nteligencia <span class="highlight-color">A</span>rtificial <span class="highlight-color">E</span>specializada
+    </div>
+    
+    <a href="https://factoriapp.io/" class="back-button">
+        <svg class="back-button-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+        </svg>
+        <span>Volver</span>
+    </a>
+
     <div class="main-container">
         <!-- Contenido de la izquierda (imagen) -->
         <div class="left-column">
-            <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/1ai-5-YNq21RRzgWClZyOe.png" alt="Agente AI" class="large-image">
+            <!-- Enlace a la imagen de Factorín, ahora con un ID para poder cambiarla -->
+            <img id="factorinImage" src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/1ai-2-AE0rRMkzMaFpB019.png" alt="Agente AI de Factoriapp" class="large-image">
         </div>
 
         <!-- Contenido de la derecha (chat) -->
@@ -334,7 +368,11 @@
                     <svg class="chat-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     </svg>
-                    <span class="close-icon">×</span>
+                    <!-- Icono de encendido/apagado de Android en SVG, con color y animación de rotación -->
+                    <svg class="close-icon-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#27D5D5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                        <line x1="12" y1="2" x2="12" y2="12"></line>
+                    </svg>
                     <div class="notification-badge" id="notificationBadge">1</div>
                 </button>
                 
@@ -347,9 +385,10 @@
                         
                         <div class="chat-messages" id="chatMessages">
                             <div class="message bot">
-                                <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/factappito-AGBb8Wv4wKiQqZqV.png" alt="Bot" class="bot-avatar">
+                                <!-- La URL de la nueva imagen del bot se ha actualizado aquí -->
+                                <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/carita-YKblRNo4GNtPJyvp.png" alt="Bot" class="bot-avatar">
                                 <div class="message-content">
-                                    ¡Hola! Soy el Agente AI de Factoriapp. Estoy aquí para ayudarte en lo que necesites.
+                                    ¡Hola! Soy tu Agente de Información de Factoriapp. Estoy aquí para ofrecerte información y ayudarte a resolver cualquier duda.
                                 </div>
                             </div>
                         </div>
@@ -374,9 +413,45 @@
     </div>
     
     <script>
+        // Variables para el estado del chat
         let isOpen = true; // El chat está abierto por defecto
         let messageCount = 0;
+        let responseCount = 0; // Nuevo contador para la respuesta del bot
 
+        // Array de URLs para las imágenes de Factorín
+        const factorinImages = [
+            "https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/1ai-2-AE0rRMkzMaFpB019.png",
+            "https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/1ai-s3-dOqDR7QRlpfxeD5l.png",
+            "https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/1ai-6b-YBgbR82RlnHrQk3m.png",
+            "https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/1ai-1-YbNJEZ2xvEflOZEk.png",
+            "https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/sentado-ALpPROklpBCXy5bk.png",
+            "https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/sentado_i-AQEZl4kMVwT5D1jB.png"
+        ];
+        let currentImageIndex = 0;
+
+        // Función para cambiar la imagen de Factorín con precarga
+        function changeFactorinImage() {
+            const factorinImageElement = document.getElementById('factorinImage');
+            if (factorinImages.length > 1) {
+                // Inicia la transición de salida (fade-out)
+                factorinImageElement.style.opacity = 0; 
+                
+                // Espera a que termine el fade-out para cambiar la imagen
+                setTimeout(() => {
+                    const nextImageIndex = (currentImageIndex + 1) % factorinImages.length;
+                    const nextImage = new Image();
+                    nextImage.src = factorinImages[nextImageIndex];
+                    
+                    nextImage.onload = () => {
+                        factorinImageElement.src = nextImage.src; // Cambia la imagen
+                        factorinImageElement.style.opacity = 1; // Inicia la transición de entrada (fade-in)
+                        currentImageIndex = nextImageIndex;
+                    };
+                }, 1500); // 1.5 segundos, igual que la transición de opacidad
+            }
+        }
+
+        // Función para alternar la visibilidad del chat
         function toggleChat() {
             const container = document.getElementById('chatContainer');
             const button = document.querySelector('.chat-button');
@@ -403,6 +478,7 @@
             }
         }
 
+        // Función para enviar un mensaje del usuario
         function sendMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
@@ -414,13 +490,22 @@
             
             showTypingIndicator();
             
+            // Simular una respuesta del bot
             setTimeout(() => {
                 hideTypingIndicator();
                 const botResponse = generateBotResponse(message);
                 addMessage(botResponse, 'bot');
+                
+                // Aumenta el contador de respuestas del bot y cambia la imagen si llega a 3
+                responseCount++;
+                if (responseCount >= 3) {
+                    changeFactorinImage();
+                    responseCount = 0; // Reinicia el contador
+                }
             }, 1500);
         }
 
+        // Función para agregar un mensaje al chat
         function addMessage(message, sender) {
             const messagesContainer = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
@@ -428,8 +513,9 @@
             
             let messageHTML = '';
             if (sender === 'bot') {
+                // La URL de la nueva imagen del bot se ha actualizado aquí
                 messageHTML = `
-                    <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/factappito-AGBb8Wv4wKiQqZqV.png" alt="Bot" class="bot-avatar">
+                    <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/carita-YKblRNo4GNtPJyvp.png" alt="Bot" class="bot-avatar">
                     <div class="message-content">${message}</div>
                 `;
             } else {
@@ -445,6 +531,7 @@
             }
         }
 
+        // Funciones para el indicador de escritura del bot
         function showTypingIndicator() {
             document.getElementById('typingIndicator').style.display = 'block';
             const messagesContainer = document.getElementById('chatMessages');
@@ -455,6 +542,7 @@
             document.getElementById('typingIndicator').style.display = 'none';
         }
 
+        // Función para mostrar la notificación de mensajes nuevos
         function showNotification() {
             const badge = document.getElementById('notificationBadge');
             badge.style.display = 'flex';
@@ -462,6 +550,7 @@
             badge.textContent = messageCount;
         }
 
+        // Función para generar una respuesta aleatoria del bot
         function generateBotResponse(userMessage) {
             const responses = [
                 "¡Gracias por tu mensaje! ¿En qué más puedo ayudarte?",
@@ -474,6 +563,7 @@
             return responses[Math.floor(Math.random() * responses.length)];
         }
 
+        // Event listener para enviar mensaje con la tecla Enter
         document.getElementById('chatInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -481,6 +571,7 @@
             }
         });
 
+        // Ajustar la altura del textarea de forma automática
         document.getElementById('chatInput').addEventListener('input', function() {
             this.style.height = '40px';
             this.style.height = Math.min(this.scrollHeight, 60) + 'px';
@@ -497,9 +588,10 @@
             button.classList.add('active');
             badge.style.display = 'none'; // Ocultar la notificación inicial
             isOpen = true;
-            document.getElementById('chatInput').focus();
+            setTimeout(() => {
+                document.getElementById('chatInput').focus();
+            }, 400);
         });
     </script>
 </body>
 </html>
-
