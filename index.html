@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agente AI de Factoriapp</title>
+    <!-- Enlace para las fuentes Montserrat, Roboto y Space Grotesk de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Roboto', sans-serif;
+            background-color: #323232;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center; /* Centra el contenido horizontalmente */
+            align-items: center; /* Centra el contenido verticalmente */
+        }
+
+        .main-container {
+            display: flex;
+            width: 100%;
+            max-width: 1300px;
+            justify-content: center; /* Centra las columnas de Factorín y el chat */
+            align-items: flex-end;
+            flex-wrap: wrap;
+            /* Se eliminó el margin-top y padding-left para que el diseño se adapte */
+        }
+
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            margin-right: 50px;
+        }
+
+        .right-column {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            height: auto;
+            position: relative;
+        }
+        
+        .large-image {
+            width: 75%;
+            height: auto;
+            border-radius: 20px;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .header-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 220px;
+            height: auto;
+        }
+        
+        /* Estilo para el nuevo texto */
+        .header-text {
+            position: absolute;
+            top: 75px;
+            left: 30px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            color: #E4EEF4;
+            font-weight: 500;
+        }
+        
+        /* Estilo para las letras destacadas */
+        .highlight-color {
+            color: #27D5D5;
+        }
+
+        /* Botón de Volver */
+        .back-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #9FC99B;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        .back-button:hover {
+            color: #E4EEF4;
+        }
+
+        .back-button-arrow {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* Estilos del chat */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: transparent;
+            text-align: left;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 15px;
+            max-height: 50vh;
+        }
+        
+        /* Estilos para la barra de desplazamiento (scrollbar) */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: #555;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background-color: #777;
+        }
+
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 0;
+            border-radius: 0;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #E4EEF4;
+            background: transparent;
+        }
+        
+        /* Estilos específicos para los mensajes del usuario */
+        .message.user .message-content {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #4A4A4A;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-style: normal;
+        }
+
+        /* Estilos específicos para los mensajes del bot */
+        .message.bot .message-content {
+            font-family: 'Montserrat', sans-serif;
+            font-style: italic;
+        }
+
+        /* Contenedor del ícono del bot */
+        .bot-icon-container {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Estilo base para los puntos. Ahora los puntos estáticos son de color #27D5D5 */
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #27D5D5;
+            border-radius: 50%;
+            margin: 0 2px;
+            transform: scale(0.8);
+            opacity: 0.5;
+        }
+        
+        /* Aplica la animación y cambia el color solo al contenedor del último mensaje */
+        .message.bot:first-child .typing-dot {
+            background-color: #E4EEF4;
+            animation: dot-pulse 1.4s infinite;
+        }
+        
+        /* Retraso de la animación para cada punto */
+        .message.bot:first-child .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .message.bot:first-child .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .message.bot:first-child .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* Definición de la animación de pulso */
+        @keyframes dot-pulse {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0.5; }
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 20px 20px 20px;
+        }
+
+        .chat-input {
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #555;
+            border-radius: 25px;
+            padding: 12px 16px;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            max-height: 60px;
+            min-height: 40px;
+            font-family: 'Roboto', sans-serif;
+            font-style: italic;
+            background-color: #444;
+            color: #E4EEF4;
+        }
+
+        .chat-input:focus {
+            border-color: #27D5D5;
+            box-shadow: 0 0 0 2px rgba(39, 213, 213, 0.2);
+        }
+
+        .send-button {
+            background-color: #2A5D75;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .send-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* Media queries para adaptar el diseño a pantallas más pequeñas */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            .left-column, .right-column {
+                max-width: 100%;
+                margin: 20px 0;
+            }
+            .right-column {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/logo4-YrDJvpa3V6sRZV5K.png" alt="Logo de Factoriapp" class="header-logo">
+    <div class="header-text">
+        <span class="highlight-color">I</span>nteligencia <span class="highlight-color">A</span>rtificial <span class="highlight-color">E</span>specializada
+    </div>
+    
+    <a href="https://factoriapp.io/" class="back-button">
+        <svg class="back-button-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+        </svg>
+        <span>Volver</span>
+    </a>
+
+    <div class="main-container">
+        <!-- Contenido de la izquierda (imagen) -->
+        <div class="left-column">
+            <!-- Enlace a la imagen de Factorín -->
+            <img id="factorinImage" src="https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/1ai-2-AE0rRMkzMaFpB019.png" alt="Agente AI de Factoriapp" class="large-image">
+        </div>
+
+        <!-- Contenido de la derecha (chat) -->
+        <div class="right-column">
+            <!-- Mensajes del chat -->
+            <div class="chat-messages" id="chatMessages">
+            </div>
+            
+            <!-- Contenedor del input y botón de envío -->
+            <div class="chat-input-wrapper">
+                <textarea class="chat-input" id="chatInput" placeholder="Escribe tu mensaje..." rows="1"></textarea>
+                <button class="send-button" onclick="sendMessage()" id="sendButton">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Variables para el estado del chat
+        let responseCount = 0;
+
+        // Array de URLs para las imágenes de Factorín
+        const factorinImages = [
+            "https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/1ai-2-AE0rRMkzMaFpB019.png",
+            "https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/1ai-s3-dOqDR7QRlpfxeD5l.png",
+            "https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/1ai-6b-YBgbR82RlnHrQk3m.png",
+            "https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/1ai-1-YbNJEZ2xvEflOZEk.png",
+            "https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/sentado-ALpPROklpBCXy5bk.png",
+            "https://assets.zyrosite.com/A1a5bgp0z1sGxPEw/sentado_i-AQEZl4kMVwT5D1jB.png"
+        ];
+        let currentImageIndex = 0;
+        
+        // Elemento para los mensajes del chat
+        const chatMessagesContainer = document.getElementById('chatMessages');
+
+        // Función para cambiar la imagen de Factorín con precarga
+        function changeFactorinImage() {
+            const factorinImageElement = document.getElementById('factorinImage');
+            if (factorinImages.length > 1) {
+                factorinImageElement.style.opacity = 0; 
+                setTimeout(() => {
+                    const nextImageIndex = (currentImageIndex + 1) % factorinImages.length;
+                    const nextImage = new Image();
+                    nextImage.src = factorinImages[nextImageIndex];
+                    nextImage.onload = () => {
+                        factorinImageElement.src = nextImage.src;
+                        factorinImageElement.style.opacity = 1;
+                        currentImageIndex = nextImageIndex;
+                    };
+                }, 1500);
+            }
+        }
+
+        // Función para enviar un mensaje del usuario
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            // 1. Añade el mensaje del usuario al chat
+            addMessage(message, 'user');
+            input.value = '';
+
+            // 2. Añade un mensaje del bot con animación de puntos
+            const botMessageElement = addBotMessage('', true);
+            
+            // 3. Simula la respuesta del bot después de un tiempo
+            setTimeout(() => {
+                const botResponse = generateBotResponse(message);
+                
+                // 4. Inicia la escritura del texto
+                typeBotResponse(botMessageElement, botResponse);
+                
+                responseCount++;
+                if (responseCount >= 3) {
+                    changeFactorinImage();
+                    responseCount = 0;
+                }
+            }, 1500);
+        }
+
+        // Función para escribir el mensaje del bot carácter por carácter
+        function typeBotResponse(messageElement, newText) {
+            const contentContainer = messageElement.querySelector('.message-content');
+            let i = 0;
+            
+            const typingInterval = setInterval(() => {
+                if (i < newText.length) {
+                    contentContainer.textContent += newText.charAt(i);
+                    i++;
+                    chatMessagesContainer.scrollTop = 0;
+                } else {
+                    clearInterval(typingInterval);
+                    // Una vez completado, actualiza el mensaje para quitar la animación
+                    updateBotMessage(messageElement, newText);
+                }
+            }, 30); // Velocidad de escritura (30ms por carácter, velocidad inicial)
+        }
+
+        // Función para agregar un mensaje al chat (del usuario o bot)
+        function addMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            let messageHTML = '';
+            if (sender === 'bot') {
+                // Los mensajes del bot ahora se añaden con una estructura base
+                messageHTML = `
+                    <div class="bot-icon-container">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                    <div class="message-content">${message}</div>
+                `;
+            } else {
+                messageHTML = `<div class="message-content">${message}</div>`;
+            }
+            
+            messageDiv.innerHTML = messageHTML;
+            chatMessagesContainer.prepend(messageDiv);
+        }
+        
+        // Función para agregar un mensaje del bot con o sin animación
+        function addBotMessage(text, isTyping = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message bot`;
+            
+            const typingDotsHTML = `
+                <div class="bot-icon-container">
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                </div>
+            `;
+            
+            messageDiv.innerHTML = `
+                ${isTyping ? typingDotsHTML : '<div class="bot-icon-container"></div>'}
+                <div class="message-content">${text}</div>
+            `;
+            
+            chatMessagesContainer.prepend(messageDiv);
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+            return messageDiv;
+        }
+        
+        // Función para actualizar el contenido de un mensaje del bot
+        function updateBotMessage(messageElement, newText) {
+            // Encuentra el contenedor del contenido y actualiza el texto
+            const contentContainer = messageElement.querySelector('.message-content');
+            contentContainer.innerHTML = newText;
+            
+            // Quita la animación de los puntos para que se queden estáticos
+            const dotContainer = messageElement.querySelector('.bot-icon-container');
+            dotContainer.innerHTML = `
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            `;
+        }
+
+
+        // Función para generar una respuesta aleatoria del bot
+        function generateBotResponse(userMessage) {
+            const responses = [
+                "¡Gracias por tu mensaje! ¿En qué más puedo ayudarte?",
+                "Entiendo tu consulta. Permíteme ayudarte con eso.",
+                "¡Perfecto! Estoy aquí para resolver todas tus dudas sobre Factoriapp.",
+                "Es un placer ayudarte. ¿Hay algo específico que necesites saber?",
+                "¡Excelente pregunta! Te ayudo de inmediato."
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        // Event listener para enviar mensaje con la tecla Enter
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Ajustar la altura del textarea de forma automática
+        document.getElementById('chatInput').addEventListener('input', function() {
+            this.style.height = '40px';
+            this.style.height = Math.min(this.scrollHeight, 60) + 'px';
+        });
+
+        // Agrega el mensaje de bienvenida al cargar la página
+        window.addEventListener('DOMContentLoaded', () => {
+            const welcomeMessage = "¡Hola! Soy tu Agente de Información de Factoriapp. Estoy aquí para ofrecerte información y ayudarte a resolver cualquier duda.";
+            const botMessageElement = addBotMessage('', true);
+            typeBotResponse(botMessageElement, welcomeMessage);
+            
+            setTimeout(() => {
+                document.getElementById('chatInput').focus();
+            }, 400);
+        });
+    </script>
+</body>
+</html>
